@@ -57,10 +57,10 @@ begin
    Put_Line("TEST 6 - Mu-Law Lossy Round-Trip Stability");
    Put_Line("  6.1 Assert that compressing and expanding 1000 stays within acceptable loss limits");
    declare
-      Original : PCM_16 := 1000;
-      Compressed : PCM_8 := Encode_Mu_Law(Original);
-      Expanded : PCM_16 := Decode_Mu_Law(Compressed);
-      Diff : Integer := abs(Integer(Original) - Integer(Expanded));
+      Original : constant PCM_16 := 1000;
+      Compressed : constant PCM_8 := Encode_Mu_Law(Original);
+      Expanded : constant PCM_16 := Decode_Mu_Law(Compressed);
+      Diff : constant Integer := abs(Integer(Original) - Integer(Expanded));
    begin
       -- Lossy compression shouldn't distort small values massively
       Assert (Diff < 100, "Mu-Law roundtrip variance too high");
@@ -97,7 +97,7 @@ begin
    Put_Line("TEST 10 - DPCM Overflow/Clipping Handling");
    Put_Line("  10.1 Assert a delta > 32767 is clamped safely without Constraint_Error");
    declare
-      Clipped : Buffer_16 := Encode_DPCM(Extreme_Buffer);
+      Clipped : constant Buffer_16 := Encode_DPCM(Extreme_Buffer);
    begin
       -- 32767 - (-32768) = 65535 (Clamped to 32767)
       Assert (Clipped(2) = 32767, "DPCM max delta clamp failed");
@@ -108,9 +108,9 @@ begin
    Put_Line("TEST 11 - A-Law Round-Trip Stability");
    Put_Line("  11.1 Assert compression/expansion cycle handles standard signals without catastrophic degradation");
    declare
-      Orig : PCM_16 := 5000;
-      Comp : PCM_8 := Encode_A_Law(Orig);
-      Expd : PCM_16 := Decode_A_Law(Comp);
+      Orig : constant PCM_16 := 5000;
+      Comp : constant PCM_8 := Encode_A_Law(Orig);
+      Expd : constant PCM_16 := Decode_A_Law(Comp);
    begin
       Assert (abs(Integer(Orig) - Integer(Expd)) < 300, "A-law distortion exceeded bounds");
       Put_Line("     PASS");
@@ -120,8 +120,8 @@ begin
    Put_Line("TEST 12 - DPCM Single Element Buffer");
    Put_Line("  12.1 Assert 1-length buffer encodes as just the single value");
    declare
-      Single : Buffer_16(1..1) := (1 => 42);
-      Res : Buffer_16 := Encode_DPCM(Single);
+      Single : constant Buffer_16(1..1) := (1 => 42);
+      Res : constant Buffer_16 := Encode_DPCM(Single);
    begin
       Assert (Res(1) = 42, "Single element encode failed");
       Put_Line("     PASS");
@@ -131,8 +131,8 @@ begin
    Put_Line("TEST 13 - DPCM Negative Space Crossing");
    Put_Line("  13.1 Assert signal crossing 0 is differenced accurately");
    declare
-      Cross : Buffer_16(1..3) := (10, 0, -10);
-      Res : Buffer_16 := Encode_DPCM(Cross);
+      Cross : constant Buffer_16(1..3) := (10, 0, -10);
+      Res : constant Buffer_16 := Encode_DPCM(Cross);
    begin
       Assert (Res(2) = -10, "Cross to 0 failed");
       Assert (Res(3) = -10, "Cross to negative failed");
