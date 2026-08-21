@@ -48,26 +48,28 @@ package body Audio_Compression is
    -- Formula: F(x) = sgn(x) * (ln(1 + u*|x|) / ln(1 + u))
    -- =========================================================================
    function Encode_Mu_Law (Sample : PCM_16) return PCM_8 is
-      Norm_X, Encoded : Float;
+      Norm_X, Abs_X, Encoded : Float;
    begin
       -- Normalize 16-bit sample to [-1.0, 1.0]
       Norm_X := Float(Sample) / 32768.0;
+      Abs_X  := abs(Norm_X);
       
       -- Apply Mu-law transformation
-      Encoded := Sgn(Norm_X) * (Log(1.0 + Mu_Value * abs(Norm_X)) / Log(1.0 + Mu_Value));
+      Encoded := Sgn(Norm_X) * (Log(1.0 + Mu_Value * Abs_X) / Log(1.0 + Mu_Value));
       
       -- Scale to 8-bit and clamp
       return Clamp_To_PCM_8(Encoded * 128.0);
    end Encode_Mu_Law;
 
    function Decode_Mu_Law (Sample : PCM_8) return PCM_16 is
-      Norm_Y, Decoded : Float;
+      Norm_Y, Abs_Y, Decoded : Float;
    begin
       -- Normalize 8-bit sample to [-1.0, 1.0]
       Norm_Y := Float(Sample) / 128.0;
+      Abs_Y  := abs(Norm_Y);
       
       -- Apply inverse Mu-law transformation: x = sgn(y) * (1/u) * ((1+u)^|y| - 1)
-      Decoded := Sgn(Norm_Y) * (1.0 / Mu_Value) * ((1.0 + Mu_Value) ** abs(Norm_Y) - 1.0);
+      Decoded := Sgn(Norm_Y) * (1.0 / Mu_Value) * (((1.0 + Mu_Value) ** Abs_Y) - 1.0);
       
       -- Scale back to 16-bit and clamp
       return Clamp_To_PCM_16(Decoded * 32768.0);
